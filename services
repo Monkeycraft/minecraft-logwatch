@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# /etc/logwatch/scripts/services/my-backup
+# /etc/logwatch/scripts/services/minecraft
 
 # Change the line separator to split by new lines.
 OLD_IFS=$IFS
