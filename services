@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# /etc/logwatch/scripts/services/my-backup
+
+# Change the line separator to split by new lines.
+OLD_IFS=$IFS
+IFS=$'\n'
+
+SERVER_WARN="----------Server Warnings----------\n"
+# The contents of the log file are given in stdin.
+for LINE in $( cat /dev/stdin ); do
+  #look for server warnings  
+  if echo $LINE|egrep 'WARN' &> /dev/null; then
+    #add lines to var
+    SERVER_WARN="$SERVER_WARN\n$LINE"
+  fi
+ 
+done
+ 
+#output all of the findings
+echo -e $SERVER_WARN
+IFS=$OLD_IFS
+
