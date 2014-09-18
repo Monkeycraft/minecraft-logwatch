@@ -6,17 +6,29 @@ OLD_IFS=$IFS
 IFS=$'\n'
 
 SERVER_WARN="----------Server Warnings----------\n"
+CHAT="----------Server Chat Messages----------\n"
+
 # The contents of the log file are given in stdin.
+# Check all input and sort them to the correct catagory
 for LINE in $( cat /dev/stdin ); do
+
   #look for server warnings  
   if echo $LINE|egrep 'WARN' &> /dev/null; then
     #add lines to var
     SERVER_WARN="$SERVER_WARN\n$LINE"
   fi
+
+  #look for chat
+  if echo $LINE|egrep 'Netty IO' &> /dev/null; then
+    #add lines to var
+    CHAT="$CHAT\n$LINE"
+  fi
+
  
 done
  
 #output all of the findings
 echo -e $SERVER_WARN
+echo -e $CHAT
 IFS=$OLD_IFS
 
