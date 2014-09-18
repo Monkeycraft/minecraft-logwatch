@@ -6,7 +6,11 @@ OLD_IFS=$IFS
 IFS=$'\n'
 
 SERVER_WARN="----------Server Warnings----------\n"
+SERVER_ERR="----------Server ERRORS----------\n"
 CHAT="----------Server Chat Messages----------\n"
+
+#set some vars
+ERROR=false
 
 # The contents of the log file are given in stdin.
 # Check all input and sort them to the correct catagory
@@ -18,6 +22,26 @@ for LINE in $( cat /dev/stdin ); do
     SERVER_WARN="$SERVER_WARN\n$LINE"
   fi
 
+  #look for server errors
+  #since errors output multi line stack trace's we need to gatther a few lines
+  #so we will turn on logging here
+  if echo $LINE|egrep 'ERROR' &> /dev/null; then
+    #add lines to var
+  ERROR=true
+  fi
+
+  #if ERROR is turned on test if it needs to be turned off else log all lines 
+  #tell it is 
+  if [ "$ERROR" = true ]; then
+    if echo $LINE|egrep 'Server thread' &> /dev/null; then
+      ERROR=false
+      SERVER_ERR="$SERVER_ERR\n\n"
+    else
+      SERVER_ERR="$SERVER_ERR\n$LINE"
+    fi
+  fi
+
+
   #look for chat
   if echo $LINE|egrep 'Netty IO' &> /dev/null; then
     #add lines to var
@@ -28,7 +52,14 @@ for LINE in $( cat /dev/stdin ); do
 done
  
 #output all of the findings
+echo -e $SERVER_ERR
+echo -e $IFS
+echo -e $IFS
 echo -e $SERVER_WARN
+echo -e $IFS
+echo -e $IFS
 echo -e $CHAT
+echo -e $IFS
+echo -e $IFS
 IFS=$OLD_IFS
 
